@@ -1,7 +1,7 @@
 <script>
 export default {
 	props: {
-		date: Number,
+		timestamp: Number,
 		icon: String,
 		temp: Object,
 		description: String,
@@ -13,7 +13,8 @@ export default {
 		};
 	},
 	created() {
-		this.newDate = new Date(this.date * 1000);
+		this.newDate = new Date(this.timestamp * 1000);
+		this.url = `http://openweathermap.org/img/wn/${this.icon}@2x.png`;
 	},
 	mounted() {
 		this.url = `http://openweathermap.org/img/wn/${this.icon}@2x.png`;
@@ -34,19 +35,31 @@ export default {
 <template>
 	<div class="weatherContainer">
 		<h2>{{ date }}</h2>
-		<p>{{ description }}</p>
-		<img :src="url" alt="" />
-		<span>Temp min : {{ temp.min }}°C</span><br />
-		<span>Temp max : {{ temp.max }}°C</span>
+		<img width="150" :src="url" alt="" />
+		<div class="weatherContainerInfos">
+			<p>{{ description }}</p>
+			<div>Temp min : {{ temp.min }}°C</div>
+			<div>Temp max : {{ temp.max }}°C</div>
+		</div>
 	</div>
 </template>
 
 <style>
 .weatherContainer {
-	width: 25%;
-	margin: 3vw;
+	text-align: center;
+	width: 25vw;
+	margin: 3vw auto;
 	border: 2px solid black;
 	border-radius: 10px;
 	background-color: lightcyan;
+}
+.weatherContainer img {
+	float: left;
+}
+.weatherContainerInfos {
+	height: 70%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
 }
 </style>

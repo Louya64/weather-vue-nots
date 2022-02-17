@@ -1,58 +1,42 @@
 <script>
 import axios from "axios";
 import Today from "../components/Today.vue";
-import Hourly from "../components/Hourly.vue";
-import Daily from "../components/Daily.vue";
+import HourlyOrDaily from "../components/HourlyOrDaily.vue";
 export default {
 	data() {
 		return {
-			zip: 13000,
-			city: "",
-			currentWeather: {},
-			hourlyWeather: [],
-			dailyWeather: [],
+			zip: 64600,
+			cityInfos: {},
+			weatherInfos: {},
 			todayDisplay: true,
 			hourlyDisplay: false,
 			dailyDisplay: false,
 		};
 	},
-	mounted() {
-		axios
-			.get(
-				`http://api.openweathermap.org/geo/1.0/zip?zip=${this.zip},fr&appid=4e574fa005b98baeaa15f3346ec9fb64`
-			)
-			.then((res) => {
-				(this.city = res.data.name),
-					axios
-						.get(
-							`https://api.openweathermap.org/data/2.5/onecall?lat=${res.data.lat}&lon=${res.data.lon}&units=metric&lang=fr&APPID=4e574fa005b98baeaa15f3346ec9fb64`
-						)
-						.then((res) => {
-							(this.currentWeather = res.data.current),
-								(this.hourlyWeather = res.data.hourly),
-								(this.dailyWeather = res.data.daily);
-						});
-			});
+
+	computed: {
+		city() {
+			return this.cityInfos?.data?.name;
+		},
+		currentWeather() {
+			return this.weatherInfos?.data?.current;
+		},
+		hourlyWeather() {
+			return this.weatherInfos?.data?.hourly;
+		},
+		dailyWeather() {
+			return this.weatherInfos?.data?.daily;
+		},
 	},
+
 	methods: {
-		updateAxios() {
-			axios
-				.get(
-					`http://api.openweathermap.org/geo/1.0/zip?zip=${this.zip},fr&appid=4e574fa005b98baeaa15f3346ec9fb64`
-				)
-				.then((res) => {
-					(this.city = res.data.name), console.log(res.data.name);
-					axios
-						.get(
-							`https://api.openweathermap.org/data/2.5/onecall?lat=${res.data.lat}&lon=${res.data.lon}&units=metric&lang=fr&APPID=4e574fa005b98baeaa15f3346ec9fb64`
-						)
-						.then((res) => {
-							(this.currentWeather = res.data.current),
-								(this.hourlyWeather = res.data.hourly),
-								(this.dailyWeather = res.data.daily),
-								(this.zip = null);
-						});
-				});
+		async getAxios() {
+			this.cityInfos = await axios.get(
+				`http://api.openweathermap.org/geo/1.0/zip?zip=${this.zip},fr&appid=4e574fa005b98baeaa15f3346ec9fb64`
+			);
+			this.weatherInfos = await axios.get(
+				`https://api.openweathermap.org/data/2.5/onecall?lat=${this.cityInfos.data.lat}&lon=${this.cityInfos.data.lon}&units=metric&lang=fr&APPID=4e574fa005b98baeaa15f3346ec9fb64`
+			);
 		},
 		displayComponent(target) {
 			if (target === "today") {
@@ -69,7 +53,12 @@ export default {
 			}
 		},
 	},
-	components: { Today, Hourly, Daily },
+
+	mounted() {
+		this.getAxios();
+	},
+
+	components: { Today, HourlyOrDaily },
 };
 </script>
 
@@ -80,16 +69,21 @@ export default {
 			<li @click="displayComponent('hourly')">Heure par heure (48h)</li>
 			<li @click="displayComponent('daily')">Prévisions sur 7 jours</li>
 		</ul>
-		<form action="" @submit.prevent="updateAxios">
+		<form action="" @submit.prevent="getAxios">
 			<label for="zip">Code postal</label>
 			<input v-model="zip" type="text" id="zip" />
 		</form>
 	</header>
-	<main>
+	<main v-if="currentWeather">
 		<h1>{{ city }}</h1>
 		<Today v-if="todayDisplay" :currentWeather="currentWeather" />
-		<Hourly v-else-if="hourlyDisplay" :hourlyWeather="hourlyWeather" />
-		<Daily v-else-if="dailyDisplay" :dailyWeather="dailyWeather" />
+		<HourlyOrDaily
+			v-else
+			:hourlyWeather="hourlyWeather"
+			:hourlyDisplay="hourlyDisplay"
+			:dailyWeather="dailyWeather"
+			:dailyDisplay="dailyDisplay"
+		/>
 	</main>
 </template>
 
@@ -121,5 +115,8 @@ h1,
 h2 {
 	text-align: center;
 	margin: 10px;
+}
+h1 {
+	margin-top: 25vh;
 }
 </style>

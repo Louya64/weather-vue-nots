@@ -15,17 +15,19 @@ export default {
 	},
 	created() {
 		this.newDate = new Date(this.timestamp * 1000);
+		console.log(this.url);
+		this.url = `http://openweathermap.org/img/wn/${this.icon}@2x.png`;
 	},
 	mounted() {
 		this.url = `http://openweathermap.org/img/wn/${this.icon}@2x.png`;
+		console.log(this.url);
 	},
 	computed: {
 		date() {
 			return this.newDate.toLocaleString("fr-FR", {
 				weekday: "long",
-				year: "numeric",
-				month: "long",
-				day: "numeric",
+				hour: "2-digit",
+				minute: "2-digit",
 			});
 		},
 	},

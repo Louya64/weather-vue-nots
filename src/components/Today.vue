@@ -1,5 +1,4 @@
 <script>
-import HourlyWeatherCard from "./HourlyWeatherCard.vue";
 export default {
 	props: {
 		currentWeather: Object,
@@ -9,7 +8,6 @@ export default {
 			newDate: "",
 		};
 	},
-	components: { HourlyWeatherCard },
 	created() {
 		this.newDate = new Date(this.currentWeather.dt * 1000);
 	},
